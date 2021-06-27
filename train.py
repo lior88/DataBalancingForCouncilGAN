@@ -116,14 +116,10 @@ if config['misc']['start_tensor_board']:
 train_writer = tensorboardX.SummaryWriter(log_directory, purge_step=iterations)
 
 if config['misc']['do_telegram_report']:           
-    try:
-        import telegram
-        from telegram.ext import Updater, MessageHandler, Filters
-    except:
-        print(colored('Failed to load Telegram Try: \n1) conda install -c conda-forge python-telegram-bot. \n OR \n2) in \".yaml\" file change do_telegram_report to False \n in the meantime Continuing without ....', color='red', attrs=['underline', 'bold', 'blink', 'reverse']))
-        config['misc']['do_telegram_report'] = False
-if config['misc']['do_telegram_report']:           
+    import telegram
+    from telegram.ext import Updater, MessageHandler, Filters
     in_ = ''
+
     confidential_yaml_file_path = './confidential_do_not_upload_to_github.yaml'
     if not os.path.exists(confidential_yaml_file_path):
         
@@ -185,7 +181,7 @@ if config['misc']['do_telegram_report']:
                 print('telegram send_document Failed')
     else:
         config['misc']['do_telegram_report'] = False
-        print('You can set do_telegram_report to False to not be asked again')
+        print('You can set do_telegram_report to False to not ask again')
 
 def test_fid(dataset1, dataset2, iteration, train_writer, name, m1=None, s1=None, retun_m1_s1=False, batch_size=10, dims=2048, cuda=True):
     import pytorch_fid.fid_score

@@ -2,7 +2,7 @@
 Implementation of our paper Breaking the Cycle - Colleagues are all you need (CVPR 2020)
 ### Paper
 [Ori Nizan](https://onr.github.io/) , [Ayellet Tal](http://webee.technion.ac.il/~ayellet/),
-**[Breaking the Cycle - Colleagues are all you need](http://openaccess.thecvf.com/content_CVPR_2020/html/Nizan_Breaking_the_Cycle_-_Colleagues_Are_All_You_Need_CVPR_2020_paper.html "Breaking the cycle -- Colleagues are all you need")**
+**[Breaking the Cycle - Colleagues are all you need](https://arxiv.org/abs/1911.10538 "Breaking the cycle -- Colleagues are all you need")**
 **[[Project](https://onr.github.io/Council_web/)]**
 
 ![gan_council_teaser](/images/paper_teaser_small.png)
@@ -15,8 +15,8 @@ Implementation of our paper Breaking the Cycle - Colleagues are all you need (CV
 
 ![anime_gif](/images/anime_gif.gif)
 
-### Temporary Telegram Bot
-Send image to this [telegram bot](https://t.me/Council_GAN_bot) and it will send you back its female translation using our implementation
+#### Temporary Telegram Bot
+Send image to this [telegram bot](https://t.me/Council_GAN_bot) and it will send back its female translation
 
 
 ## Usage
@@ -85,25 +85,15 @@ or using spsified memeber:
 
     bash ./scripts/download.sh pretrain_male_to_female
     
-###### Then to convert images in --input_folder run:
-
-    python test_on_folder.py --config pretrain/m2f/256/male2female_council_folder.yaml --output_folder ./outputs/male2famle_256_256 --checkpoint pretrain/m2f/256/01000000 --input_folder ./datasets/celeba_male2female/testA --a2b 1
-    
 #### Download pretrain glasses removal model:
 
     bash ./scripts/download.sh pretrain_glasses_removal
     
-###### Then to convert images in --input_folder run:
-
-    python test_on_folder.py --config pretrain/glasses_removal/128/galsses_council_folder.yaml --output_folder ./outputs/council_glasses_128_128 --checkpoint pretrain/glasses_removal/128/01000000 --input_folder ./datasets/glasses/testA --a2b 1
-    
 #### Download pretrain selfie to anime model:
 
     bash ./scripts/download.sh pretrain_selfie_to_anime
-    
-###### Then to convert images in --input_folder run:
 
-    python test_on_folder.py --config pretrain/anime/256/anime2face_council_folder.yaml --output_folder ./outputs/council_anime2face_256_256 --checkpoint pretrain/anime/256/01000000 --input_folder ./datasets/selfie2anime/testB --a2b 0
+
 
 ### Test GUI:
 ![gan_council_overview](/images/test_gui.png)
@@ -119,19 +109,13 @@ or using spsified memeber:
 ##### selfie2anime
     python test_gui.py --config pretrain/anime/256/anime2face_council_folder.yaml --checkpoint pretrain/anime/256/b2a_gen_3_01000000.pt --a2b 0
     
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Onr/Council-GAN/blob/master/Council_gan_basic_inference.ipynb)
-
     
 #### Citation
 ```
 @inproceedings{nizan2020council,
   title={Breaking the Cycle - Colleagues are all you need},
-  author={Ori Nizan and Ayellet Tal},
+  author={Ori Nizan, Ayellet Tal},
   booktitle={IEEE conference on computer vision and pattern recognition (CVPR)},
   year={2020}
 }
 ```
-
-#### Acknowledgement
-In this work we based our code on [MUNIT](https://github.com/NVlabs/MUNIT) implementation.  Please cite the original [MUNIT](https://arxiv.org/abs/1804.04732) if you use  their part of the code.
-

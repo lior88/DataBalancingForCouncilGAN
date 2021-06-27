@@ -8,6 +8,8 @@ import torch
 import numpy as np
 from warnings import warn
 
+
+
 def default_loader(path):
     return Image.open(path).convert('RGB')
 
@@ -44,6 +46,43 @@ class ImageFilelist(data.Dataset):
     def __len__(self):
         return len(self.imlist)
 
+
+
+def other_flist_reader(flist, root):
+    # added in order to use a csv file with a general images folder
+    """
+    flist format: impath label\nimpath label\n ...(same to caffe's filelist)
+    """
+    imlist = []
+    with open(flist, 'r') as rf:
+        for line in rf.readlines():
+            if not (line.strip() == 'image_id'):
+                impath = line.strip()
+                impath = os.path.join(root, impath)
+                imlist.append(impath)
+
+    return imlist
+
+
+class ImageFilelistOther(data.Dataset):
+    # added in order to use a csv file with a general images folder
+    def __init__(self, root, flist, transform=None,
+                 flist_reader=other_flist_reader, loader=default_loader):
+        self.root = root
+        self.imlist = flist_reader(flist, root)
+        self.transform = transform
+        self.loader = loader
+
+    def __getitem__(self, index):
+        impath = self.imlist[index]
+        img = self.loader(os.path.join(self.root, impath))
+        if self.transform is not None:
+            img = self.transform(img)
+
+        return img
+
+    def __len__(self):
+        return len(self.imlist)
 
 class ImageLabelFilelist(data.Dataset):
     def __init__(self, root, flist, transform=None,
@@ -217,3 +256,4 @@ class ImageFolder_with_subfolders(data.Dataset):
 
     def __len__(self):
         return max(len(self.imgs1), len(self.imgs2))
+

@@ -32,7 +32,7 @@ parser.add_argument('--a2b', type=int, default=1, help="1 for a2b 0 for b2a")
 parser.add_argument('--seed', type=int, default=1, help="random seed")
 parser.add_argument('--num_style',type=int, default=10, help="number of styles to sample")
 parser.add_argument('--output_only', action='store_true', help="whether only save the output images or also save the input images")
-parser.add_argument('--num_of_images_to_test', type=int, default=10000, help="number of images to sample")
+parser.add_argument('--num_of_images_to_test', type=int, default=100000, help="number of images to sample")
 
 data_name = 'out'
 
@@ -82,23 +82,23 @@ else:
         try:
             if opts.a2b:
                 tmp_checkpoint = opts.checkpoint[:-8] + 'a2b_gen_' + str(i) + '_' + opts.checkpoint[-8:] + '.pt'
-                state_dict = torch.load(tmp_checkpoint, map_location=trainer.gen_a2b_s[i].cuda_device)
+                state_dict = torch.load(tmp_checkpoint)
                 trainer.gen_a2b_s[i].load_state_dict(state_dict['a2b'])
             else:
                 tmp_checkpoint = opts.checkpoint[:-8] + 'b2a_gen_' + str(i) + '_' + opts.checkpoint[-8:] + '.pt'
-                state_dict = torch.load(tmp_checkpoint, map_location=trainer.gen_b2a_s[i].cuda_device)
+                state_dict = torch.load(tmp_checkpoint)
                 trainer.gen_b2a_s[i].load_state_dict(state_dict['b2a'])
         except:
             print('opts.a2b should be set to ' + str(not opts.a2b) + ' , Or config file could be wrong')
-
+            
             opts.a2b = not opts.a2b
             if opts.a2b:
                 tmp_checkpoint = opts.checkpoint[:-8] + 'a2b_gen_' + str(i) + '_' + opts.checkpoint[-8:] + '.pt'
-                state_dict = torch.load(tmp_checkpoint, map_location=trainer.gen_a2b_s[i].cuda_device)
+                state_dict = torch.load(tmp_checkpoint)
                 trainer.gen_a2b_s[i].load_state_dict(state_dict['a2b'])
             else:
                 tmp_checkpoint = opts.checkpoint[:-8] + 'b2a_gen_' + str(i) + '_' + opts.checkpoint[-8:] + '.pt'
-                state_dict = torch.load(tmp_checkpoint, map_location=trainer.gen_b2a_s[i].cuda_device)
+                state_dict = torch.load(tmp_checkpoint)
                 trainer.gen_b2a_s[i].load_state_dict(state_dict['b2a'])
             
 

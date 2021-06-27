@@ -11,8 +11,9 @@ from networks import Vgg16
 from torch.autograd import Variable
 from torch.optim import lr_scheduler
 from torchvision import transforms
-from data import ImageFilelist, ImageFolder, ImageFolder_with_subfolders
+from data import ImageFilelist, ImageFolder, ImageFolder_with_subfolders, ImageFilelistOther
 import torch
+import pandas as pd
 import torch.nn as nn
 import os
 import math
@@ -170,12 +171,65 @@ def get_data_loader_folder(input_folder, batch_size, train, new_size=None,
             transform_list = [transforms.RandomPerspective(distortion_scale=0.35, p=0.5)] + transform_list if train else transform_list
 
     transform = transforms.Compose(transform_list)
-    if ratio_1_to_2 is None:
-        dataset = ImageFolder(input_folder, transform=transform)
+    if ('different' in config) and (config['different'] == 1):  #checking whether to use the dataset balancing method
+        df = pd.read_csv(config['attributes_root']) #change location of attributes file
+        if(is_data_A == True):
+            if(config['m2f'] == 1): #m2f domain transfer, balance Blond
+                df = df[df['Male'] == 1]
+                dBlondPMaleP = df[df['Blond_Hair'] == 1]
+                dBlondPMaleP = dBlondPMaleP.append(dBlondPMaleP)  # 3498
+                dBlondPMaleP = dBlondPMaleP.append(dBlondPMaleP)  # 6996
+                dBlondPMaleP = dBlondPMaleP.append(dBlondPMaleP)  # 13992
+                dBlondPMaleP = dBlondPMaleP.append(dBlondPMaleP)  # 27984
+                dBlondPMaleP = dBlondPMaleP.append(dBlondPMaleP)  # 55968
+                dBlondPMaleP = dBlondPMaleP.append(dBlondPMaleP.iloc[:26717])  # 82695
+                df = df.append(dBlondPMaleP.iloc[1749:])
+                print('male Blond')
+                print(df[df['Blond_Hair'] == 1].shape[0])
+                print(df[df['Blond_Hair'] == -1].shape[0])
+            else: #Eyeglasses domain transfer, balance Male
+                df = df[df['Eyeglasses'] == 1]
+                dMaleNEyeglassesP = df[df['Male'] == -1]
+                dMaleNEyeglassesP = dMaleNEyeglassesP.append(dMaleNEyeglassesP)  # 5430
+                dMaleNEyeglassesP = dMaleNEyeglassesP.append(dMaleNEyeglassesP.iloc[:5048])  # 10478
+                df = df.append(dMaleNEyeglassesP.iloc[2715:])
+                print('Eyeglasses Male')
+                print(df[df['Male'] == 1].shape[0])
+                print(df[df['Male'] == -1].shape[0])
+        else:
+            if(config['m2f'] == 1): #m2f domain transfer, balance Blond
+                df = df[df['Male'] == -1]
+                dBlondPMaleN = df[df['Blond_Hair'] == 1]
+                dBlondPMaleN = dBlondPMaleN.append(dBlondPMaleN)  # 56468
+                dBlondPMaleN = dBlondPMaleN.append(dBlondPMaleN.iloc[:33463])  # 89931
+                df = df.append(dBlondPMaleN.iloc[28234:])
+                print('Female Blond')
+                print(df[df['Blond_Hair'] == 1].shape[0])
+                print(df[df['Blond_Hair'] == -1].shape[0])
+            else:  #Eyeglasses domain transfer, balance Male
+                df = df[df['Eyeglasses'] == -1]
+                dMalePEyeglassesN = df[df['Male'] == 1]
+                dMalePEyeglassesN = dMalePEyeglassesN.append(dMalePEyeglassesN.iloc[:41494])  # 115450
+                df = df.append(dMalePEyeglassesN.iloc[73956:])
+                print('Not Eyeglasses Male')
+                print(df[df['Male'] == 1].shape[0])
+                print(df[df['Male'] == -1].shape[0])
+
+        df = df.loc[:, 'image_id']
+        num_items = df.shape[0]
+        if(train == True):
+            df = df[:round(0.8*num_items)]
+        else:
+            df = df[round(0.8*num_items):]
+        df.to_csv(r'/home/danlior/Council-GAN-master/df.csv', index=False)
+        dataset = ImageFilelistOther(config['data_root'], '/home/danlior/Council-GAN-master/df.csv', transform=transform)
     else:
-        input_folder_1 = os.path.join(input_folder, '1')
-        input_folder_2 = os.path.join(input_folder, '2')
-        dataset = ImageFolder_with_subfolders(root1=input_folder_1, root2=input_folder_2, ratio_1_to_2=ratio_1_to_2, transform=transform)
+        if ratio_1_to_2 is None:
+            dataset = ImageFolder(input_folder, transform=transform)
+        else:
+            input_folder_1 = os.path.join(input_folder, '1')
+            input_folder_2 = os.path.join(input_folder, '2')
+            dataset = ImageFolder_with_subfolders(root1=input_folder_1, root2=input_folder_2, ratio_1_to_2=ratio_1_to_2, transform=transform)
 
     loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=train, drop_last=True, num_workers=num_workers)
     return loader
